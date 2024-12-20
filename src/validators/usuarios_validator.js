@@ -1,6 +1,7 @@
 const { check, validationResult } = require('express-validator');
 const bcrypt = require('bcrypt');
 const responseStatus = require('../config/responseStatus');
+const createResult = require('../config/result');
 
 const validatePassword = (value, { req }) => {
     if (value.length < 8) {
@@ -51,7 +52,13 @@ const validateCreateUser = [
     async (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.status(responseStatus.BAD_REQUEST.code).json({ errors: errors.array() });
+            return res.status(responseStatus.BAD_REQUEST.code).json(
+                createResult({
+                    status: responseStatus.BAD_REQUEST.code,
+                    error: errors.array()
+                }
+                )
+            );
         }
         // Encriptar la contraseña después de la validación
         try {
@@ -59,7 +66,12 @@ const validateCreateUser = [
             req.body.clave = await bcrypt.hash(req.body.clave, salt);
             next();
         } catch (err) {
-            return res.status(responseStatus.INTERNAL_SERVER_ERROR.code).json({ error: 'Error al encriptar la clave' });
+            return res.status(responseStatus.INTERNAL_SERVER_ERROR.code).json(
+                createResult({
+                    status: responseStatus.INTERNAL_SERVER_ERROR.code,
+                    error: 'Error al encriptar la clave'
+                }
+                ));
         }
     }
 ];
@@ -75,7 +87,12 @@ const validateUpdateUser = [
     async (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.status(responseStatus.BAD_REQUEST.code).json({ errors: errors.array() });
+            return res.status(responseStatus.BAD_REQUEST.code).json(
+                createResult({
+                    status: responseStatus.BAD_REQUEST.code,
+                    error: errors.array()
+                }
+                ));
         }
         // Encriptar la contraseña si está presente en la actualización
         if (req.body.clave) {
@@ -83,7 +100,12 @@ const validateUpdateUser = [
                 const salt = await bcrypt.genSalt(10);
                 req.body.clave = await bcrypt.hash(req.body.clave, salt);
             } catch (err) {
-                return res.status(responseStatus.INTERNAL_SERVER_ERROR.code).json({ error: 'Error al encriptar la clave' });
+                return res.status(responseStatus.INTERNAL_SERVER_ERROR.code).json(
+                    createResult({
+                        status: responseStatus.INTERNAL_SERVER_ERROR.code,
+                        error: 'Error al encriptar la clave'
+                    }
+                    ));
             }
         }
         next();
@@ -93,7 +115,12 @@ const validateUpdateUser = [
 const validateResult = (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(responseStatus.BAD_REQUEST.code).json({ errors: errors.array() });
+        return res.status(responseStatus.BAD_REQUEST.code).json(
+            createResult({
+                status: responseStatus.BAD_REQUEST.code,
+                error: errors.array()
+            }
+            ));
     }
     next();
 };
