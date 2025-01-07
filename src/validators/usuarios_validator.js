@@ -41,6 +41,23 @@ const validatePassword = (value, { req }) => {
     return true;
 };
 
+const validateLogin = [
+    check('correo').isEmail().withMessage('El correo ingresado no es válido'),
+    check('clave').notEmpty().withMessage('La clave es requerida'),
+    async (req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(responseStatus.BAD_REQUEST.code).json(
+                createResult({
+                    status: responseStatus.BAD_REQUEST.code,
+                    error: errors.array()
+                }
+                ));
+        }
+        next();
+    },
+];
+
 const validateCreateUser = [
     check('nombre').notEmpty().withMessage('El nombre es requerido'),
     check('correo').isEmail().withMessage('El correo no es válido'),
@@ -125,4 +142,4 @@ const validateResult = (req, res, next) => {
     next();
 };
 
-module.exports = { validateCreateUser, validateUpdateUser, validateResult };
+module.exports = { validateLogin ,validateCreateUser, validateUpdateUser, validateResult };

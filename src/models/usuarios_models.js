@@ -1,5 +1,7 @@
 const db = require('../config/database');
+const { generateJWT, verifyJWT, validateJWT } = require('../middleware/jwt');
 const TABLES = require('../config/tables');
+const bcrypt = require('bcrypt');
 
 class UsuarioModel {
     // Constructor con cada una de las variables que se instanciarían
@@ -37,7 +39,35 @@ class UsuarioModel {
     static PROC_ACTUALIZAR_USUARIO = 'actualizar_usuario';
     static PROC_ACTUALIZAR_ESTADO_USUARIO = 'actualizar_estado_usuario';
     static PROC_ELIMINAR_USUARIO = 'eliminar_usuario';
-    
+
+    // Metodo para el LOGIN
+    async Login(email, password) {
+        const sql = `SELECT ${TABLES.usuarios.ID} , ${TABLES.usuarios.CORREO} , ${TABLES.usuarios.DUI} , ${TABLES.usuarios.CLAVE} FROM ${UsuarioModel.VISTA_USUARIOS} WHERE ${TABLES.usuarios.CORREO} = ?`;
+        const params = [email];
+        const row = await db.getRow(sql, params);
+        // Verificar si el usuario existe
+        if (!row) {
+            return false; // Usuario no encontrado
+        }
+
+        // Comparar la contraseña usando bcrypt
+        const isMatch = await bcrypt.compare(password, row.CLAVE);
+
+        if (isMatch) {
+            // Generar un JWT con los datos del usuario
+            const userData = {
+                id: row.ID,
+                correo: row.CORREO,
+                nombre: row.NOMBRE,
+                dui: row.DUI,
+            };
+            const token = generateJWT(userData);
+            return token;
+        } else {
+            return false;
+        }
+    }
+
     // Métodos CRUD y funcionalidades relacionadas
     // Método para crear un usuario
     async createUser() {
@@ -60,21 +90,21 @@ class UsuarioModel {
     }
 
     // Método para actualizar un usuario
-    async updateRow(){
+    async updateRow() {
         const procedureName = UsuarioModel.PROC_ACTUALIZAR_USUARIO;
         const params = [this.id, this.nombre, this.correo, this.telefono, this.dui, this.direccion, this.nacimiento, this.estado];
         return await db.executeProcedure(procedureName, params);
     }
 
     // Método para actualizar el estado de un usuario
-    async updateState(){
+    async updateState() {
         const procedureName = UsuarioModel.PROC_ACTUALIZAR_ESTADO_USUARIO;
         const params = [this.id];
         return await db.executeProcedure(procedureName, params);
     }
 
     // Método para eliminar un usuario
-    async deleteRow(){
+    async deleteRow() {
         const procedureName = UsuarioModel.PROC_ELIMINAR_USUARIO;
         const params = [this.id];
         return await db.executeProcedure(procedureName, params);

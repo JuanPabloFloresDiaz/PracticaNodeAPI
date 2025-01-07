@@ -1,7 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const multer = require('multer');
-const usuariosRouter = require('./src/routes/public/usuarios_router');
+const usuariosRouterPublic = require('./src/routes/public/usuarios_router');
+const usuariosRouterPrivate = require('./src/routes/private/usuarios_router');
 const { validateBody } = require('./src/middleware/petitions');
 
 const app = express();
@@ -21,7 +22,8 @@ app.use(upload.none());
 app.use(validateBody);
 
 // Rutas
-app.use('/api', usuariosRouter);
+app.use('/api', usuariosRouterPublic);
+app.use('/api', usuariosRouterPrivate);
 
 // Ruta de prueba
 app.get('/', (req, res) => {

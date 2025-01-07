@@ -6,6 +6,7 @@ const TABLES = {
         ID: 'ID',
         NOMBRE: 'NOMBRE',
         CORREO: 'CORREO',
+        CLAVE: 'CLAVE',
         TELEFONO: 'TELÉFONO',
         DUI: 'DUI',
         DIRECCION: 'DIRECCIÓN',

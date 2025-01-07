@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const UsuariosController = require('../../controllers/public/usuarios_controller');
-const { validateCreateUser, validateUpdateUser, validateResult } = require('../../validators/usuarios_validator');
+const { validateLogin, validateCreateUser, validateUpdateUser, validateResult } = require('../../validators/usuarios_validator');
 
+router.post('/login', validateLogin, UsuariosController.Login);
 router.post('/usuarios', validateCreateUser, validateResult, UsuariosController.createUser);
 router.get('/usuarios', UsuariosController.getAllUsers);
 router.get('/usuarios/:id', UsuariosController.getUserById);
