@@ -15,14 +15,14 @@ class UsuariosController {
                     createResult({
                         status: responseStatus.OK.code,
                         message: messages.success.login,
-                        dataset: { token }
+                        token: token 
                     })
                 );
             } else {
                 res.status(responseStatus.UNAUTHORIZED.code).json(
                     createResult({
                         status: responseStatus.UNAUTHORIZED.code,
-                        message: messages.error.login,
+                        error: messages.error.login,
                         dataset: null
                     })
                 );
@@ -31,8 +31,7 @@ class UsuariosController {
             res.status(responseStatus.INTERNAL_SERVER_ERROR.code).json(
                 createResult({
                     status: responseStatus.INTERNAL_SERVER_ERROR.code,
-                    message: messages.error.login,
-                    error: error.message
+                    error: messages.error.login,
                 })
             );
         }
