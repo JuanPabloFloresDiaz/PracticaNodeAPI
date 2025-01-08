@@ -1,9 +1,9 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const multer = require('multer');
-const usuariosRouterPublic = require('./src/routes/public/usuarios_router');
-const usuariosRouterPrivate = require('./src/routes/private/usuarios_router');
 const { validateBody } = require('./src/middleware/petitions');
+const fs = require('fs');
+const path = require('path');
 const cors = require('cors');
 
 const app = express();
@@ -30,8 +30,23 @@ app.use(upload.none());
 app.use(validateBody);
 
 // Rutas
-app.use('/api', usuariosRouterPublic);
-app.use('/api', usuariosRouterPrivate);
+// Función para cargar dinámicamente las rutas
+function cargarRutas(rutaBase) {
+    fs.readdirSync(rutaBase).forEach(file => {
+        const filePath = path.join(rutaBase, file);
+        if (fs.statSync(filePath).isDirectory()) {
+            cargarRutas(filePath);  // Recursión si encontramos subdirectorios
+        } else if (file.endsWith('router.js')) {
+            const ruta = require(filePath);
+            const rutaPrefix = '/api/' + file.split('.')[0]; // Usamos el nombre del archivo como prefijo de ruta
+            app.use(rutaPrefix, ruta);
+            console.log(`Ruta cargada: ${rutaPrefix}`);
+        }
+    });
+}
+
+// Cargar las rutas de las carpetas src/routes
+cargarRutas(path.join(__dirname, 'src/routes'));
 
 // Ruta de prueba
 app.get('/', (req, res) => {
