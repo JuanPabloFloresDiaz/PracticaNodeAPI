@@ -42,7 +42,8 @@ class UsuarioModel {
 
     // Metodo para el LOGIN
     async Login(email, password) {
-        const sql = `SELECT ${TABLES.usuarios.ID} , ${TABLES.usuarios.CORREO} , ${TABLES.usuarios.DUI} , ${TABLES.usuarios.CLAVE} FROM ${UsuarioModel.VISTA_USUARIOS} WHERE ${TABLES.usuarios.CORREO} = ?`;
+        const sql = `SELECT ${TABLES.usuarios.ID} , ${TABLES.usuarios.CORREO} , ${TABLES.usuarios.DUI} , ${TABLES.usuarios.CLAVE} 
+        FROM ${UsuarioModel.VISTA_USUARIOS} WHERE ${TABLES.usuarios.CORREO} = ?`;
         const params = [email];
         const row = await db.getRow(sql, params);
         // Verificar si el usuario existe

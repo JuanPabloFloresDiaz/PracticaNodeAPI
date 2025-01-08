@@ -4,9 +4,17 @@ const multer = require('multer');
 const usuariosRouterPublic = require('./src/routes/public/usuarios_router');
 const usuariosRouterPrivate = require('./src/routes/private/usuarios_router');
 const { validateBody } = require('./src/middleware/petitions');
+const cors = require('cors');
 
 const app = express();
-const PORT = 3000;
+
+app.use(cors({
+    origin: 'http://localhost:3000', // Asegúrate de que este sea el origen correcto de tu frontend
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+
+const PORT = 4000;
 
 // Configuración de multer para manejar form-data
 const upload = multer();

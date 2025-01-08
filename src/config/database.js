@@ -38,15 +38,19 @@ class Database {
             return false;
         }
     }
-    
+
     // Método para ejecutar procedimientos almacenados dependiendo del gestor de base de datos que se este utilizando
     static async executeProcedure(procedureName, params = [], transaction = null) {
         try {
             await this.connect();
-            const query =
-                config.dialect === 'mysql'
-                    ? `CALL ${procedureName}(${params.map(() => '?').join(', ')})`
-                    : `EXEC ${procedureName} ${params.map(() => '?').join(', ')}`;
+            let query;
+            if (config.dialect === 'mysql') {
+                query = `CALL ${procedureName}(${params.map(() => '?').join(', ')})`;
+            } else if (config.dialect === 'postgresql') {
+                query = `SELECT * FROM ${procedureName}(${params.map(() => '?').join(', ')})`;
+            } else {
+                query = `EXEC ${procedureName} ${params.map(() => '?').join(', ')}`;
+            };
             return await this.sequelize.query(query, {
                 type: QueryTypes.RAW,
                 replacements: params,
@@ -57,7 +61,7 @@ class Database {
             return false;
         }
     }
-    
+
     // Método para obtener el ID de la última fila insertada
     static async getLastRow(query, replacements, transaction = null) {
         try {
