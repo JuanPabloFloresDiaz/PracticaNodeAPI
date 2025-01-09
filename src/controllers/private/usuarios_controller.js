@@ -1,57 +1,46 @@
 const UsuarioModel = require('../../models/usuarios_models');
 const responseStatus = require('../../config/responseStatus');
 const messages = require('../../config/messages');
-const { validateJWT} = require('../../middleware/jwt');
+const { validateJWT } = require('../../middleware/jwt');
 const createResult = require('../../config/result');
 
 class UsuariosController {
     // Métodos protegidos por la JWT
     static async getUser(req, res) {
-    try {
-        // Obtener el token del header
-        const authHeader = req.headers['authorization'];
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            return res.status(responseStatus.UNAUTHORIZED.code).json(
+        try {
+            const authHeader = req.headers['authorization'];
+
+            // Validar el JWT directamente
+            const userData = validateJWT(authHeader);
+            if (!userData) {
+                return res.status(responseStatus.UNAUTHORIZED.code).json(
+                    createResult({
+                        status: responseStatus.UNAUTHORIZED.code,
+                        message: messages.error.auth.invalidToken,
+                    })
+                );
+            }
+
+            // Responder con los datos del usuario
+            res.status(responseStatus.OK.code).json(
                 createResult({
-                    status: responseStatus.UNAUTHORIZED.code,
-                    message: messages.error.auth.tokenMissing,
+                    status: responseStatus.OK.code,
+                    message: messages.success.auth.validToken,
+                    dataset: [userData], // Devuelve los datos como un arreglo dentro de "dataset"
+                })
+            );
+        } catch (error) {
+            // Manejo de errores
+            res.status(responseStatus.INTERNAL_SERVER_ERROR.code).json(
+                createResult({
+                    status: responseStatus.INTERNAL_SERVER_ERROR.code,
+                    message: messages.error.server,
+                    error: error.message,
                 })
             );
         }
-
-        // Extraer el token
-        const token = authHeader.split(' ')[1];
-
-        // Verificar y decodificar el token
-        const userData = await validateJWT(token); // Asume que validateJWT retorna los datos del usuario
-        if (!userData) {
-            return res.status(responseStatus.UNAUTHORIZED.code).json(
-                createResult({
-                    status: responseStatus.UNAUTHORIZED.code,
-                    message: messages.error.auth.invalidToken,
-                })
-            );
-        }
-
-        // Responder con los datos del usuario
-        res.status(responseStatus.OK.code).json(
-            createResult({
-                status: responseStatus.OK.code,
-                message: messages.success.auth.validToken,
-                dataset: [userData], // Devuelve los datos como un arreglo dentro de "dataset"
-            })
-        );
-    } catch (error) {
-        // Manejo de errores
-        res.status(responseStatus.INTERNAL_SERVER_ERROR.code).json(
-            createResult({
-                status: responseStatus.INTERNAL_SERVER_ERROR.code,
-                message: messages.error.server,
-                error: error.message,
-            })
-        );
     }
-}
+
 
     // Método para crear un nuevo usuario
     static async createUser(req, res) {

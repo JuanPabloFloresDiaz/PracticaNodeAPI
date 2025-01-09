@@ -1,4 +1,5 @@
 const messages = {
+
     // Mensajes de éxito
     success: {
         create: (instance) => `${instance} creado correctamente.`,
@@ -9,12 +10,15 @@ const messages = {
         state: (instance) => `Estado ${instance} modificado correctamente.`,
         login: `Autenticación exitosa.`,
         test: `Testeando metodo`,
+        auth: {
+            validToken: 'Token válido.',
+        },
     },
     // Mensajes de error
     error: {
-        create: (instance) =>`Ocurrió un problema al crear ${instance}.`,
-        update: (instance) =>`Ocurrió un problema al modificar ${instance}.`,
-        delete: (instance) =>`Ocurrió un problema al eliminar ${instance}.`,
+        create: (instance) => `Ocurrió un problema al crear ${instance}.`,
+        update: (instance) => `Ocurrió un problema al modificar ${instance}.`,
+        delete: (instance) => `Ocurrió un problema al eliminar ${instance}.`,
         search: `No hay coincidencias.`,
         readAll: (instance) => `No existen ${instance} registrados.`,
         readOne: (instance) => `${instance} incorrecto.`,
@@ -27,6 +31,10 @@ const messages = {
         action: `Acción no válida.`,
         server: `Error interno en el servidor.`,
         unauthorized: `No autorizado.`,
+        auth: {
+          invalidToken: 'Token inválido.',
+          tokenMissing: 'Token no proporcionado.',
+        },
     },
     // Mensajes personalizados según condiciones
     conditions: {

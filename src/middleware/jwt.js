@@ -46,12 +46,19 @@ const verifyJWT = (req, res, next) => {
 
 
 // Función para validar un JWT directamente (opcional)
-const validateJWT = (token) => {
+const validateJWT = (authHeader) => {
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return null; // Devuelve null si no hay encabezado o si está mal formado
+  }
+
+  // Extraer el token sin el prefijo 'Bearer '
+  const token = authHeader.split(' ')[1];
   try {
-    return jwt.verify(token, secretKey);
+    return jwt.verify(token, secretKey); // Verifica el token puro
   } catch (error) {
-    return null;
+    return null; // Devuelve null si la verificación falla
   }
 };
+
 
 module.exports = { generateJWT, verifyJWT, validateJWT };
